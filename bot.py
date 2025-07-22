@@ -30,29 +30,28 @@ def get_or_create_customer(message):
         customer = Customer.query.filter_by(telegram_id=message.from_user.id).first()
         
         if not customer:
-            customer = Customer()
-            customer.telegram_id = message.from_user.id
-            customer.username = message.from_user.username
-            customer.first_name = message.from_user.first_name
-            customer.last_name = message.from_user.last_name
-            
+            customer = Customer(
+                telegram_id=message.from_user.id,
+                username=message.from_user.username,
+                first_name=message.from_user.first_name,
+                last_name=message.from_user.last_name,
+                last_activity=datetime.utcnow()
+            )
             db.session.add(customer)
             
             # Update daily stats
             today = date.today()
             stats = BotStats.query.filter_by(date=today).first()
             if not stats:
-                stats = BotStats()
-                stats.date = today
-                stats.new_users = 1
-                stats.total_messages = 1
+                stats = BotStats(
+                    date=today,
+                    new_users=1,
+                    total_messages=1
+                )
                 db.session.add(stats)
             else:
                 stats.new_users += 1
                 stats.total_messages += 1
-                
-            db.session.commit()
-            logging.info(f"New customer created: {customer.full_name}")
         else:
             customer.last_activity = datetime.utcnow()
             
@@ -62,32 +61,34 @@ def get_or_create_customer(message):
             if stats:
                 stats.total_messages += 1
             else:
-                stats = BotStats()
-                stats.date = today
-                stats.total_messages = 1
+                stats = BotStats(
+                    date=today,
+                    total_messages=1
+                )
                 db.session.add(stats)
                 
-            db.session.commit()
-        
+        db.session.commit()
         return customer
+        
     except Exception as e:
         logging.error(f"Error in get_or_create_customer: {e}")
         # Create minimal customer object for fallback
-        customer = Customer()
-        customer.telegram_id = message.from_user.id
-        customer.username = message.from_user.username or "Unknown"
-        customer.first_name = message.from_user.first_name or "User"
-        return customer
+        return Customer(
+            telegram_id=message.from_user.id,
+            username=message.from_user.username or "Unknown",
+            first_name=message.from_user.first_name or "User"
+        )
 
 def save_message(customer, message_text, message_type=MessageType.TEXT, from_admin=False):
     """Save message to database"""
     try:
-        message = Message()
-        message.customer_id = customer.id
-        message.content = message_text
-        message.message_type = message_type
-        message.from_admin = from_admin
-        
+        message = Message(
+            customer_id=customer.id,
+            content=message_text,
+            message_type=message_type,
+            from_admin=from_admin,
+            created_at=datetime.utcnow()
+        )
         db.session.add(message)
         db.session.commit()
     except Exception as e:
@@ -114,7 +115,9 @@ def handle_all_messages(message):
         # Check for button commands
         if message.text == Config.COMMANDS['address']:
             bot.send_message(message.chat.id, Config.MESSAGES['address'])
-        elif message.text == Config.COMMANDS['booking']:
+        elif message.text == 
+        Config.COMMANDS['booking']:
+            
             bot.send_message(message.chat.id, Config.MESSAGES['booking_site'])
         elif message.text == Config.COMMANDS['contact']:
             bot.send_message(message.chat.id, Config.MESSAGES['contact_whatsapp'])
@@ -142,7 +145,7 @@ def handle_media_message(message):
 
 def setup_webhook():
     """Setup webhook for production"""
-    if app.config['WEBHOOK_URL']:
+    if app.config.get('WEBHOOK_URL'):
         webhook_url = f"{app.config['WEBHOOK_URL']}/webhook"
         bot.set_webhook(url=webhook_url)
         logging.info(f"Webhook set to: {webhook_url}")
@@ -155,8 +158,7 @@ def webhook():
         update = telebot.types.Update.de_json(json_string)
         bot.process_new_updates([update])
         return ''
-    else:
-        return 'Invalid content type', 400
+    return 'Invalid content type', 400
 
 def send_message_to_customer(telegram_id, text):
     """Send message to customer from admin"""
@@ -166,3 +168,8 @@ def send_message_to_customer(telegram_id, text):
     except Exception as e:
         logging.error(f"Error sending message to {telegram_id}: {e}")
         return False
+
+# Initialize webhook if in production
+if app.config.get('ENV') == 'production':
+    setup_webhook()
+                             
