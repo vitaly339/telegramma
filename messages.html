@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block title %}Сообщения - Батутный парк{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1><i class="fas fa-envelope me-2"></i>Сообщения</h1>
+            <p class="text-muted">Общение с клиентами</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Customers Sidebar -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-users me-2"></i>Клиенты</h6>
+                </div>
+                <div class="card-body p-0" style="max-height: 600px; overflow-y: auto;">
+                    {% for customer in customers %}
+                    <div class="d-flex align-items-center p-3 border-bottom customer-item 
+                         {% if customer_id == customer.id %}bg-primary bg-opacity-10{% endif %}"
+                         style="cursor: pointer;"
+                         onclick="location.href='{{ url_for('messages', customer_id=customer.id) }}'">
+                        <div class="avatar me-3">
+                            <i class="fas fa-user-circle fa-2x text-muted"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">{{ customer.full_name }}</h6>
+                            <small class="text-muted d-block">
+                                Активность: {{ format_datetime(customer.last_activity) }}
+                            </small>
+                            {% if customer.messages %}
+                            <small class="text-muted">
+                                {{ customer.messages|length }} сообщений
+                            </small>
+                            {% endif %}
+                        </div>
+                        {% set unread_count = customer.messages|selectattr('from_admin', 'equalto', false)|selectattr('read', 'equalto', false)|list|length %}
+                        {% if unread_count > 0 %}
+                        <span class="badge bg-danger rounded-pill">{{ unread_count }}</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="col-md-8">
+            {% if customer_id %}
+            {% set selected_customer = customers|selectattr('id', 'equalto', customer_id)|first %}
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0">
+                            <i class="fas fa-user-circle me-2"></i>{{ selected_customer.full_name }}
+                        </h6>
+                        {% if selected_customer.username %}
+                        <small class="text-muted">@{{ selected_customer.username }}</small>
+                        {% endif %}
+                        {% if selected_customer.phone %}
+                        <small class="text-muted ms-2">{{ selected_customer.phone }}</small>
+                        {% endif %}
+                    </div>
+                    <a href="{{ url_for('bookings', customer_id=customer_id) }}" 
+                       class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-calendar-alt me-1"></i>Брони
+                    </a>
+                </div>
+                
+                <!-- Messages List -->
+                <div class="card-body p-0" style="height: 400px; overflow-y: auto;" id="messagesContainer">
+                    {% for message in messages.items %}
+                    {% if message.customer_id == customer_id %}
+                    <div class="d-flex p-3 border-bottom 
+                         {% if message.from_admin %}justify-content-end{% else %}justify-content-start{% endif %}">
+                        <div class="message-bubble 
+                             {% if message.from_admin %}bg-primary text-white{% else %}bg-light{% endif %} 
+                             p-3 rounded" style="max-width: 70%;">
+                            <div class="message-content mb-2">
+                                {% if message.message_type.value == 'text' %}
+                                {{ message.content }}
+                                {% elif message.message_type.value == 'photo' %}
+                                <i class="fas fa-image me-1"></i>{{ message.content }}
+                                {% elif message.message_type.value == 'document' %}
+                                <i class="fas fa-file me-1"></i>{{ message.content }}
+                                {% elif message.message_type.value == 'voice' %}
+                                <i class="fas fa-microphone me-1"></i>{{ message.content }}
+                                {% endif %}
+                            </div>
+                            <small class="d-block text-end {% if message.from_admin %}text-light{% else %}text-muted{% endif %}">
+                                {{ format_datetime(message.created_at) }}
+                                {% if message.from_admin %}
+                                <i class="fas fa-user-shield ms-1" title="От администратора"></i>
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Send Message Form -->
+                <div class="card-footer">
+                    <form method="POST" action="{{ url_for('send_message') }}" class="d-flex">
+                        <input type="hidden" name="customer_id" value="{{ customer_id }}">
+                        <input type="text" name="message" class="form-control me-2" 
+                               placeholder="Введите сообщение..." required>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <!-- No customer selected -->
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                    <h5>Выберите клиента</h5>
+                    <p class="text-muted">Выберите клиента из списка слева, чтобы просмотреть сообщения</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if not customer_id %}
+    <!-- All Messages Overview -->
+    <div class="row mt-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="fas fa-list me-2"></i>Все сообщения</h6>
+                </div>
+                <div class="card-body p-0">
+                    {% if messages.items %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Клиент</th>
+                                    <th>Сообщение</th>
+                                    <th>Тип</th>
+                                    <th>Время</th>
+                                    <th>Статус</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for message in messages.items %}
+                                <tr class="{% if not message.read and not message.from_admin %}table-warning{% endif %}">
+                                    <td>
+                                        <a href="{{ url_for('messages', customer_id=message.customer.id) }}" 
+                                           class="text-decoration-none">
+                                            {{ message.customer.full_name }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {{ message.content[:100] }}{% if message.content|length > 100 %}...{% endif %}
+                                    </td>
+                                    <td>
+                                        {% if message.message_type.value == 'text' %}
+                                        <i class="fas fa-comment" title="Текст"></i>
+                                        {% elif message.message_type.value == 'photo' %}
+                                        <i class="fas fa-image" title="Фото"></i>
+                                        {% elif message.message_type.value == 'document' %}
+                                        <i class="fas fa-file" title="Документ"></i>
+                                        {% elif message.message_type.value == 'voice' %}
+                                        <i class="fas fa-microphone" title="Голосовое"></i>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ format_datetime(message.created_at) }}</td>
+                                    <td>
+                                        {% if message.from_admin %}
+                                        <span class="badge bg-info">От админа</span>
+                                        {% elif message.read %}
+                                        <span class="badge bg-success">Прочитано</span>
+                                        {% else %}
+                                        <span class="badge bg-warning">Новое</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if messages.pages > 1 %}
+                    <div class="card-footer">
+                        <nav aria-label="Навигация по страницам">
+                            <ul class="pagination justify-content-center mb-0">
+                                {% if messages.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('messages', page=messages.prev_num) }}">
+                                        Предыдущая
+                                    </a>
+                                </li>
+                                {% endif %}
+
+                                {% for page_num in messages.iter_pages() %}
+                                    {% if page_num %}
+                                        {% if page_num != messages.page %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url_for('messages', page=page_num) }}">
+                                                {{ page_num }}
+                                            </a>
+                                        </li>
+                                        {% else %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ page_num }}</span>
+                                        </li>
+                                        {% endif %}
+                                    {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">…</span>
+                                    </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if messages.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('messages', page=messages.next_num) }}">
+                                        Следующая
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-envelope fa-3x text-muted mb-3"></i>
+                        <h5>Сообщений пока нет</h5>
+                        <p class="text-muted">Когда клиенты начнут писать боту, их сообщения появятся здесь</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-scroll to bottom of messages
+document.addEventListener('DOMContentLoaded', function() {
+    const messagesContainer = document.getElementById('messagesContainer');
+    if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+});
+
+// Highlight customer items on hover
+document.querySelectorAll('.customer-item').forEach(item => {
+    item.addEventListener('mouseenter', function() {
+        this.classList.add('bg-light');
+    });
+    item.addEventListener('mouseleave', function() {
+        if (!this.classList.contains('bg-primary')) {
+            this.classList.remove('bg-light');
+        }
+    });
+});
+</script>
+{% endblock %}
