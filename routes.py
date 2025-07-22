@@ -95,29 +95,29 @@ def send_message():
     return redirect(url_for('messages', customer_id=customer_id))
 
 @app.route('/analytics')
-@login_required
 def analytics():
     stats = get_dashboard_stats()
-    chart_data =
-    get_weekly_chart_data()
-    
-    # Additional analytics
-    top_customers = 
-    db.session.query(
+    chart_data = get_weekly_chart_data()
+
+    top_customers = db.session.query(
         Customer,
-        
         db.func.count(Booking.id).label('booking_count')
     ).join(Booking).group_by(Customer.id).order_by(
-        
         db.func.count(Booking.id).desc()
     ).limit(10).all()
-    
-    booking_status_counts =
-    db.session.query(
+
+    booking_status_counts = db.session.query(
         Booking.status,
         db.func.count(Booking.id)
-    ).group_by(Booking.status).all(
-        
+    ).group_by(Booking.status).all()
+
+    return render_template(
+        'analytics.html',
+        stats=stats,
+        chart_data=chart_data,
+        top_customers=top_customers,
+        booking_status_counts=booking_status_counts,
+        get_status_text=get_status_text
     )
 
 return render_template(
