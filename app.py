@@ -5,33 +5,35 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
+from werkzeug.security import generate_password_hash
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
+# SQLAlchemy base
 class Base(DeclarativeBase):
     pass
 
 db = SQLAlchemy(model_class=Base)
 login_manager = LoginManager()
 
-# create the app
+# Flask app creation
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "trampoline-park-secret-key")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
-# configure the database
+# Database config
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///trampoline_park.db")
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
 }
 
-# Telegram bot configuration
+# Telegram config
 app.config["TELEGRAM_TOKEN"] = os.environ.get("TELEGRAM_TOKEN", "")
 app.config["WEBHOOK_URL"] = os.environ.get("WEBHOOK_URL", "")
 
-# initialize extensions
+# Init extensions
 db.init_app(app)
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -43,17 +45,15 @@ def load_user(user_id):
     return Admin.query.get(int(user_id))
 
 with app.app_context():
-    # Import project_models to ensure tables are created
-    import project_models
+    # Импорты внутри контекста, чтобы избежать циклов
+    from project_models import Admin
     import routes
     import bot
-    
+
+    # Создание таблиц
     db.create_all()
-    
-    # Create default admin user if not exists
-    from project_models import Admin
-    from werkzeug.security import generate_password_hash
-    
+
+    # Создание дефолтного админа, если его нет
     if not Admin.query.first():
         admin = Admin(
             username='admin',
