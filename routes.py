@@ -2,7 +2,7 @@ from flask import render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
 from app import app, db
-from models import Admin, Customer, Booking, Message, BookingStatus
+from project_models import Admin, Customer, Booking, Message, BookingStatus
 from utils import get_dashboard_stats, get_weekly_chart_data, format_datetime, format_date, get_status_badge_class, get_status_text
 from bot import send_message_to_customer
 import logging
