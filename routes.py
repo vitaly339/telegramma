@@ -1,111 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash, jsonify
-from flask_login import login_user, logout_user, login_required, current_user
-from werkzeug.security import check_password_hash, generate_password_hash
-from app import app, db
-from project_models import Admin, Customer, Booking, Message, BookingStatus
-from utils import get_dashboard_stats, get_weekly_chart_data, format_datetime, format_date, get_status_badge_class, get_status_text
-from bot import send_message_to_customer
-import logging
-
-@app.route('/')
-@login_required
-def dashboard():
-    stats = get_dashboard_stats()
-    chart_data = get_weekly_chart_data()
-    
-    # Recent activities
-    recent_customers = Customer.query.order_by(Customer.created_at.desc()).limit(5).all()
-    recent_bookings = Booking.query.order_by(Booking.created_at.desc()).limit(5).all()
-    unread_messages = Message.query.filter(
-        Message.from_admin == False,
-        Message.read == False
-    ).order_by(Message.created_at.desc()).limit(5).all()
-    
-    return render_template('dashboard.html', 
-                         stats=stats,
-                         chart_data=chart_data,
-                         recent_customers=recent_customers,
-                         recent_bookings=recent_bookings,
-                         unread_messages=unread_messages,
-                         format_datetime=format_datetime,
-                         get_status_badge_class=get_status_badge_class,
-                         get_status_text=get_status_text)
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        
-        admin = Admin.query.filter_by(username=username).first()
-        
-        if admin and check_password_hash(admin.password_hash, password):
-            login_user(admin)
-            next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('dashboard'))
-        else:
-            flash('Неверное имя пользователя или пароль', 'error')
-    
-    return render_template('login.html')
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('login'))
-
-@app.route('/customers')
-@login_required
-def customers():
-    page = request.args.get('page', 1, type=int)
-    search = request.args.get('search', '')
-    
-    query = Customer.query
-    
-    if search:
-        query = query.filter(
-            db.or_(
-                Customer.first_name.contains(search),
-                Customer.last_name.contains(search),
-                Customer.username.contains(search),
-                Customer.phone.contains(search)
-            )
-        )
-    
-    customers = query.order_by(Customer.created_at.desc()).paginate(
-        page=page, per_page=20, error_out=False
-    )
-    
-    return render_template('customers.html', 
-                         customers=customers, 
-                         search=search,
-                         format_datetime=format_datetime)
-
-@app.route('/bookings')
-@login_required
-def bookings():
-    page = request.args.get('page', 1, type=int)
-    status_filter = request.args.get('status', '')
-    
-    query = Booking.query
-    
-    if status_filter:
-        query = query.filter(Booking.status == BookingStatus(status_filter))
-    
-    bookings = query.order_by(Booking.created_at.desc()).paginate(
-        page=page, per_page=20, error_out=False
-    )
-    
-    return render_template('bookings.html', 
-                         bookings=bookings,
-                         status_filter=status_filter,
-                         BookingStatus=BookingStatus,
-                         format_datetime=format_datetime,
-                         format_date=format_date,
-                         get_status_badge_class=get_status_badge_class,
-                         get_status_text=get_status_text)
-
-@app.route('/booking/<int:booking_id>/update_status', methods=['POST'])
+route('/booking/<int:booking_id>/update_status', methods=['POST'])
 @login_required
 def update_booking_status(booking_id):
     booking = Booking.query.get_or_404(booking_id)
@@ -124,11 +17,18 @@ def update_booking_status(booking_id):
         }
         
         if new_status in status_messages:
-            send_message_to_customer(customer.telegram_id, status_messages[new_status])
+            try:
+                send_message_to_customer(customer.telegram_id, status_messages[new_status])
+            except Exception as e:
+                logger.error(f"Ошибка отправки сообщения: {e}")
         
         flash(f'Статус брони обновлен на "{get_status_text(new_status)}"', 'success')
     except ValueError:
         flash('Некорректный статус', 'error')
+        logger.error(f"Некорректный статус: {new_status}")
+    except Exception as e:
+        flash('Ошибка при обновлении статуса', 'error')
+        logger.error(f"Ошибка обновления статуса: {e}")
     
     return redirect(url_for('bookings'))
 
@@ -148,7 +48,10 @@ def messages():
             Message.from_admin == False,
             Message.read == False
         ).update({'read': True})
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception as e:
+            logger.error(f"Ошибка пометки сообщений как прочитанных: {e}")
     
     messages = query.order_by(Message.created_at.desc()).paginate(
         page=page, per_page=50, error_out=False
@@ -170,19 +73,24 @@ def send_message():
     
     customer = Customer.query.get_or_404(customer_id)
     
-    if send_message_to_customer(customer.telegram_id, message_text):
-        # Save message to database
-        message = Message(
-            customer_id=customer.id,
-            content=message_text,
-            from_admin=True
-        )
-        db.session.add(message)
-        db.session.commit()
-        
-        flash('Сообщение отправлено', 'success')
-    else:
+    try:
+        success = send_message_to_customer(customer.telegram_id, message_text)
+        if success:
+            # Save message to database
+            message = Message(
+                customer_id=customer.id,
+                content=message_text,
+                from_admin=True
+            )
+            db.session.add(message)
+            db.session.commit()
+            flash('Сообщение отправлено', 'success')
+        else:
+            flash('Ошибка отправки сообщения', 'error')
+            logger.error(f"Ошибка отправки сообщения клиенту {customer_id}")
+    except Exception as e:
         flash('Ошибка отправки сообщения', 'error')
+        logger.error(f"Ошибка отправки сообщения: {e}")
     
     return redirect(url_for('messages', customer_id=customer_id))
 
@@ -204,8 +112,9 @@ def analytics():
         Booking.status,
         db.func.count(Booking.id)
     ).group_by(Booking.status).all()
-    
-    return render_template('analytics.html',
+
+
+return render_template('analytics.html',
                          stats=stats,
                          chart_data=chart_data,
                          top_customers=top_customers,
