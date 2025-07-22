@@ -1,4 +1,16 @@
-route('/booking/<int:booking_id>/update_status', methods=['POST'])
+from flask import render_template, request, flash, redirect, url_for
+from flask_login import login_required
+from app import app, db
+from models import Booking, Customer, Message, BookingStatus
+from helpers import (get_dashboard_stats, get_weekly_chart_data, 
+                    get_status_text, get_status_badge_class,
+                    format_datetime, format_date,
+                    send_message_to_customer)
+import logging
+
+logger = logging.getLogger(__name__)
+
+@app.route('/booking/<int:booking_id>/update_status', methods=['POST'])
 @login_required
 def update_booking_status(booking_id):
     booking = Booking.query.get_or_404(booking_id)
@@ -95,6 +107,7 @@ def send_message():
     return redirect(url_for('messages', customer_id=customer_id))
 
 @app.route('/analytics')
+@login_required
 def analytics():
     stats = get_dashboard_stats()
     chart_data = get_weekly_chart_data()
@@ -118,18 +131,6 @@ def analytics():
         top_customers=top_customers,
         booking_status_counts=booking_status_counts,
         get_status_text=get_status_text
-    )
-
-return render_template(
-    'analytics.html',
-    stats=stats,
-    chart_data=chart_data,
-                        
- top_customers=top_customers,
-                      
-booking_status_counts=booking_status_counts,
-    
-get_status_text=get_status_text
     )
 
 # Template filters
