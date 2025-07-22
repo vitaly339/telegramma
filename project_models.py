@@ -15,14 +15,14 @@ class MessageType(enum.Enum):
     DOCUMENT = "document"
     VOICE = "voice"
 
-class Admin(UserMixin, db.project_model):
+class Admin(UserMixin, db.model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-class Customer(db.project_model):
+class Customer(db.model):
     id = db.Column(db.Integer, primary_key=True)
     telegram_id = db.Column(db.BigInteger, unique=True, nullable=False)
     username = db.Column(db.String(64))
@@ -41,7 +41,7 @@ class Customer(db.project_model):
         names = [self.first_name, self.last_name]
         return ' '.join(filter(None, names)) or self.username or f"Пользователь {self.telegram_id}"
 
-class Booking(db.project_model):
+class Booking(db.model):
     id = db.Column(db.Integer, primary_key=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
     booking_date = db.Column(db.DateTime, nullable=False)
@@ -52,7 +52,7 @@ class Booking(db.project_model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-class Message(db.project_model):
+class Message(db.model):
     id = db.Column(db.Integer, primary_key=True)
     customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
     message_type = db.Column(db.Enum(MessageType), default=MessageType.TEXT)
@@ -62,7 +62,7 @@ class Message(db.project_model):
     read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-class BotStats(db.project_model):
+class BotStats(db.model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date, unique=True, nullable=False)
     new_users = db.Column(db.Integer, default=0)
