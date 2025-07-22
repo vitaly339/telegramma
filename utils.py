@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from models import BotStats, Customer, Booking, Message
+from project_models import BotStats, Customer, Booking, Message
 from app import db
 from sqlalchemy import func
 
