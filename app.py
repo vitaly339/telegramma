@@ -39,12 +39,12 @@ login_manager.login_message = 'Пожалуйста, войдите для до�
 
 @login_manager.user_loader
 def load_user(user_id):
-    from models import Admin
+    from project_models import Admin
     return Admin.query.get(int(user_id))
 
 with app.app_context():
-    # Import models to ensure tables are created
-    import models
+    # Import project_models to ensure tables are created
+    import project_models
     import routes
     import bot
     
