@@ -51,7 +51,7 @@ with app.app_context():
     db.create_all()
     
     # Create default admin user if not exists
-    from models import Admin
+    from project_models import Admin
     from werkzeug.security import generate_password_hash
     
     if not Admin.query.first():
