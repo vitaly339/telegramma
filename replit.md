@@ -28,7 +28,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Key Components
 
-### Database Models
+### Database project_models
 - **Admin**: User accounts for web dashboard access
 - **Customer**: Telegram users who interact with the bot
 - **Booking**: Customer reservation requests with status tracking
