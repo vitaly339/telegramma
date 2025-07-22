@@ -1,7 +1,7 @@
 import telebot
 from telebot import types
 from app import app, db
-from models import Customer, Booking, Message, BotStats, BookingStatus, MessageType
+from project_models import Customer, Booking, Message, BotStats, BookingStatus, MessageType
 from config import Config
 from datetime import datetime, date
 import logging
