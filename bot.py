@@ -115,9 +115,7 @@ def handle_all_messages(message):
         # Check for button commands
         if message.text == Config.COMMANDS['address']:
             bot.send_message(message.chat.id, Config.MESSAGES['address'])
-        elif message.text == 
-        Config.COMMANDS['booking']:
-            
+        elif message.text == Config.COMMANDS['booking']:
             bot.send_message(message.chat.id, Config.MESSAGES['booking_site'])
         elif message.text == Config.COMMANDS['contact']:
             bot.send_message(message.chat.id, Config.MESSAGES['contact_whatsapp'])
