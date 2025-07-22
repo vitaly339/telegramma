@@ -1,21 +1,12 @@
 import os
 import logging
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.security import generate_password_hash
+from extensions import db, login_manager  # Импорт из нового модуля
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
-
-# SQLAlchemy base
-class Base(DeclarativeBase):
-    pass
-
-db = SQLAlchemy(model_class=Base)
-login_manager = LoginManager()
 
 # Flask app creation
 app = Flask(__name__)
@@ -41,15 +32,16 @@ login_manager.login_message = 'Пожалуйста, войдите для до�
 
 @login_manager.user_loader
 def load_user(user_id):
+    # Отложенный импорт для избежания циклических зависимостей
     from project_models import Admin
     return Admin.query.get(int(user_id))
 
-with app.app_context():
-    # Импорты внутри контекста, чтобы избежать циклов
-    from project_models import Admin
-    import routes
-    import bot
+# Импорт маршрутов и моделей ПОСЛЕ инициализации приложения
+from project_models import Admin
+import routes
+import bot
 
+with app.app_context():
     # Создание таблиц
     db.create_all()
 
