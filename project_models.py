@@ -81,4 +81,4 @@ class BotStats(db.Model):  # Исправлено db.model на db.Model
     new_users = db.Column(db.Integer, default=0)
     total_messages = db.Column(db.Integer, default=0)
     bookings_created = db.Column(db.Integer, default=0)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
