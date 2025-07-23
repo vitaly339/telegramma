@@ -3,7 +3,7 @@ from flask_login import login_required
 from app import app, db
 from project_models import Booking, Customer, Message, BookingStatus
 from helpers import (get_dashboard_stats, get_weekly_chart_data, 
-                    get_status_text, get_status_badge_class,
+                    get_status_badge_class,
                     format_datetime, format_date,
                     send_message_to_customer)
 import logging
