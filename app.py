@@ -15,6 +15,10 @@ logging.basicConfig(level=logging.DEBUG)
 # Flask app creation
 app = Flask(__name__)
 
+@app.route('/customers')
+def customers():
+    return render_template('customers.html')
+
 @app.route('/')
 def index():
     return render_template('login.html')
