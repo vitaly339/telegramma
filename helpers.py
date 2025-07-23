@@ -10,10 +10,10 @@ def get_dashboard_stats():
     try:
         stats = {
             'total_bookings': Booking.query.count(),
-            'active_customers': Customer.query.filter()
+            'active_customers': Customer.query.filter(
                 
                 Customer.last_activity >= datetime.utcnow() - timedelta(days=30)
-                .count(),
+            ).count(),
             'recent_bookings': Booking.query.filter(
                 Booking.created_at >= datetime.utcnow() - timedelta(days=7))
                 .count()
