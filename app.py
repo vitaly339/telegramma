@@ -26,6 +26,30 @@ def bookings():
 @app.route('/')
 def index():
     return render_template('login.html')
+
+@app.route('/')
+def index():
+    return render_template('login.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    from flask import request, redirect, url_for
+    from flask_login import login_user
+    from werkzeug.security import check_password_hash
+    from project_models import Admin
+
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        user = Admin.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password_hash, password):
+            login_user(user)
+            return redirect(url_for('admin'))  # Измени на нужный маршрут
+        else:
+            return render_template('login.html', error='Неверный логин или пароль')
+
+    return render_template('login.html')
     
 app.secret_key = os.environ.get("SESSION_SECRET", "trampoline-park-secret-key")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
