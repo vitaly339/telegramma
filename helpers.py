@@ -5,6 +5,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+def format_datetime(dt, format="%d.%m.%Y %H:%M"):
+    """Форматирует datetime в строку"""
+    if not dt:
+        return ""
+    return dt.strftime(format)
+
 def get_status_badge_class(status_code):
     """Возвращает CSS-класс для бейджа по статусу бронирования"""
     classes = {
