@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from flask import current_app
 from project_models import db, Booking, Customer, Message
 import logging
@@ -11,6 +11,7 @@ def get_dashboard_stats():
         stats = {
             'total_bookings': Booking.query.count(),
             'active_customers': Customer.query.filter(
+                
                 Customer.last_activity >= datetime.utcnow() - timedelta(days=30)
                 .count(),
             'recent_bookings': Booking.query.filter(
