@@ -7,6 +7,15 @@ from datetime import datetime, date
 import logging
 import re
 from flask import request
+import telegram
+from flask import current_app
+
+def setup_webhook():
+    token = current_app.config["TELEGRAM_TOKEN"]
+    webhook_url = current_app.config["WEBHOOK_URL"]
+
+bot = telegram.Bot(token=token)
+bot.set_webhook(url=f"{webhook_url}/webhook")
 
 # Initialize bot with fallback token
 bot_token = app.config.get('TELEGRAM_TOKEN') or '7861899004:AAHHUEAolQwwsSXkz7YLddd_qnnxesQIj24'
