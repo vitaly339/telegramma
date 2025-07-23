@@ -3,7 +3,7 @@ from flask import current_app
 from project_models import db, Booking, Customer, Message
 import logging
 
-logger = logging.getLogger(_name_)
+logger = logging.getLogger(__name__)
 
 def get_dashboard_stats():
     """Возвращает статистику бронирований и клиентов"""
