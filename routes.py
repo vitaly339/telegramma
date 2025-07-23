@@ -16,7 +16,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET','POST'])
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
