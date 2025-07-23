@@ -15,7 +15,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 @app.route("/")
-def index():
+def login():
     return redirect(url_for('login'))
   
   @app.route('/login', methods=['GET', 'POST'])
