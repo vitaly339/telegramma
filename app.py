@@ -60,6 +60,6 @@ with app.app_context():
         logging.info("Default admin user created: admin/admin123")
 
 # 💡 ЭТО ВАЖНО: Запуск сервера
-if _name_ == "_main_":
+if __name__ == "_main_":
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
