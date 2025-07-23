@@ -11,7 +11,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-@app.route("/")
+@app.route("/admin")
 def home():
     return "Бот работает! Всё подключено."
 
