@@ -47,7 +47,7 @@
                     <li class="nav-item">
                         <a class="nav-link position-relative" href="{{ url_for('messages') }}">
                             <i class="fas fa-envelope me-1"></i>Сообщения
-                            {% if stats and stats.unread_messages > 0 %}
+                            {% if stats and stats.get('unread_messages', 0) > 0 %}
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                 {{ stats.unread_messages }}
                             </span>
