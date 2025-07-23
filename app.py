@@ -10,12 +10,27 @@ from werkzeug.security import generate_password_hash
 from flask_login import logout_user
 from flask import redirect, url_for
 from extensions import db, login_manager # Импорт из нового модуля
+from flask import request
+import telegram
+
+bot = telegram.Bot(token='ТВОЙ_ТОКЕН_БОТА')
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
 # Flask app creation
 app = Flask(__name__)
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    update = telegram.Update.de_json(request.get_json(force=True), bot)
+    chat_id = update.message.chat.id
+    text = update.message.text
+
+    # Пример простой логики: отправить ответ
+    bot.send_message(chat_id=chat_id, text=f"Привет! Ты написал: {text}")
+
+    return 'ok'
 
 @app.route('/customers')
 def customers():
