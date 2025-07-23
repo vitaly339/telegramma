@@ -5,6 +5,15 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+def get_status_text(status_code):
+    """Возвращает текстовый статус по коду"""
+    statuses = {
+        0: "Ожидает",
+        1: "Подтверждено",
+        2: "Отменено"
+    }
+    return statuses.get(status_code, "Неизвестно")
+
 def get_dashboard_stats():
     """Возвращает статистику бронирований и клиентов"""
     try:
