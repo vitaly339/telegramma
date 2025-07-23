@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block title %}Панель управления - Батутный парк{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1><i class="fas fa-tachometer-alt me-2"></i>Панель управления</h1>
+            <p class="text-muted">Обзор активности вашего Telegram бота</p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary">
+                <div class="card-body text-white">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Всего клиентов</h5>
+                            <h2 class="mb-0">{{ stats.total_customers }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                    <small>+{{ stats.new_customers_today }} сегодня</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success">
+                <div class="card-body text-white">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Всего броней</h5>
+                            <h2 class="mb-0">{{ stats.total_bookings }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-calendar-alt fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                    <small>+{{ stats.bookings_today }} сегодня</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info">
+                <div class="card-body text-white">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Всего сообщений</h5>
+                            <h2 class="mb-0">{{ stats.total_messages }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-envelope fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                    <small>Обработано ботом</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning">
+                <div class="card-body text-dark">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h5 class="card-title">Непрочитанные</h5>
+                            <h2 class="mb-0">{{ stats.unread_messages }}</h2>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-bell fa-2x opacity-50"></i>
+                        </div>
+                    </div>
+                    <small>Требуют ответа</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Активность за неделю</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="weeklyChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>За месяц</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Новые клиенты</span>
+                        <span class="badge bg-primary rounded-pill">{{ stats.new_customers_month }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Новые брони</span>
+                        <span class="badge bg-success rounded-pill">{{ stats.bookings_month }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>За неделю</span>
+                        <span class="badge bg-info rounded-pill">{{ stats.new_customers_week }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0"><i class="fas fa-user-plus me-2"></i>Новые клиенты</h6>
+                    <a href="{{ url_for('customers') }}" class="btn btn-sm btn-outline-secondary">Все</a>
+                </div>
+                <div class="card-body p-0">
+                    {% for customer in recent_customers %}
+                    <div class="d-flex align-items-center p-3 border-bottom">
+                        <div class="avatar me-3">
+                            <i class="fas fa-user-circle fa-2x text-muted"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">{{ customer.full_name }}</h6>
+                            <small class="text-muted">{{ format_datetime(customer.created_at) }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0"><i class="fas fa-calendar me-2"></i>Последние брони</h6>
+                    <a href="{{ url_for('bookings') }}" class="btn btn-sm btn-outline-secondary">Все</a>
+                </div>
+                <div class="card-body p-0">
+                    {% for booking in recent_bookings %}
+                    <div class="d-flex align-items-center p-3 border-bottom">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">{{ booking.customer.full_name }}</h6>
+                            <small class="text-muted d-block">{{ format_datetime(booking.booking_date) }}</small>
+                            <small class="text-muted">{{ booking.participants }} чел., {{ booking.duration }} мин.</small>
+                        </div>
+                        <span class="badge {{ get_status_badge_class(booking.status) }}">
+                            {{ get_status_text(booking.status) }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0"><i class="fas fa-envelope me-2"></i>Новые сообщения</h6>
+                    <a href="{{ url_for('messages') }}" class="btn btn-sm btn-outline-secondary">Все</a>
+                </div>
+                <div class="card-body p-0">
+                    {% for message in unread_messages %}
+                    <div class="d-flex align-items-start p-3 border-bottom">
+                        <div class="avatar me-3">
+                            <i class="fas fa-user-circle fa-lg text-muted"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">{{ message.customer.full_name }}</h6>
+                            <p class="mb-1 small">{{ message.content[:50] }}{% if message.content|length > 50 %}...{% endif %}</p>
+                            <small class="text-muted">{{ format_datetime(message.created_at) }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Weekly chart
+const ctx = document.getElementById('weeklyChart').getContext('2d');
+const chartData = {{ chart_data | tojson }};
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: chartData.dates,
+        datasets: [{
+            label: 'Новые пользователи',
+            data: chartData.new_users,
+            borderColor: 'rgb(54, 162, 235)',
+            backgroundColor: 'rgba(54, 162, 235, 0.1)',
+            tension: 0.1
+        }, {
+            label: 'Сообщения',
+            data: chartData.messages,
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+            tension: 0.1
+        }, {
+            label: 'Брони',
+            data: chartData.bookings,
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

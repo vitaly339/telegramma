@@ -1,0 +1,299 @@
+/* Custom styles for Trampoline Park Dashboard */
+
+/* Root variables for consistent theming */
+:root {
+    --trampoline-primary: #0d6efd;
+    --trampoline-success: #198754;
+    --trampoline-info: #0dcaf0;
+    --trampoline-warning: #ffc107;
+    --trampoline-danger: #dc3545;
+    --sidebar-width: 280px;
+}
+
+/* Layout improvements */
+.min-vh-100 {
+    min-height: 100vh;
+}
+
+/* Card enhancements */
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: box-shadow 0.15s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Statistics cards */
+.card.bg-primary,
+.card.bg-success,
+.card.bg-info,
+.card.bg-warning {
+    border: none;
+    transition: transform 0.2s ease-in-out;
+}
+
+.card.bg-primary:hover,
+.card.bg-success:hover,
+.card.bg-info:hover,
+.card.bg-warning:hover {
+    transform: translateY(-2px);
+}
+
+/* Navigation improvements */
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+.nav-link {
+    transition: color 0.15s ease-in-out;
+    border-radius: 0.375rem;
+    margin: 0 0.25rem;
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Table improvements */
+.table {
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.05);
+}
+
+.table thead th {
+    border-bottom: 2px solid var(--bs-border-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.025em;
+}
+
+.table tbody tr {
+    transition: background-color 0.15s ease-in-out;
+}
+
+/* Message bubbles */
+.message-bubble {
+    border-radius: 1rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.message-bubble.bg-primary {
+    background: linear-gradient(135deg, var(--trampoline-primary) 0%, #0b5ed7 100%);
+}
+
+.message-bubble.bg-light {
+    background: var(--bs-gray-100);
+    border: 1px solid var(--bs-border-color);
+}
+
+/* Customer list items */
+.customer-item {
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    border-radius: 0.375rem;
+    margin: 0.25rem;
+}
+
+.customer-item:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    transform: translateX(4px);
+}
+
+.customer-item.bg-primary {
+    background-color: rgba(13, 110, 253, 0.1) !important;
+    border-left: 3px solid var(--trampoline-primary);
+}
+
+/* Badge improvements */
+.badge {
+    font-weight: 500;
+    padding: 0.5em 0.75em;
+}
+
+/* Avatar placeholders */
+.avatar {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Form improvements */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--trampoline-primary);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Button improvements */
+.btn {
+    font-weight: 500;
+    transition: all 0.15s ease-in-out;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--trampoline-primary) 0%, #0b5ed7 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0b5ed7 0%, #0a58ca 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 0.375rem 0.75rem rgba(13, 110, 253, 0.25);
+}
+
+/* Loading states */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Charts container */
+.card-body canvas {
+    max-height: 300px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 0.5rem;
+    }
+    
+    .card-body {
+        padding: 1rem 0.75rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    .message-bubble {
+        max-width: 85% !important;
+        font-size: 0.875rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+}
+
+/* Dark theme specific adjustments */
+[data-bs-theme="dark"] {
+    --bs-body-bg: #0d1117;
+    --bs-body-color: #e6edf3;
+}
+
+[data-bs-theme="dark"] .card {
+    background-color: #161b22;
+    border: 1px solid #30363d;
+}
+
+[data-bs-theme="dark"] .table {
+    --bs-table-bg: transparent;
+    --bs-table-border-color: #30363d;
+}
+
+[data-bs-theme="dark"] .message-bubble.bg-light {
+    background-color: #21262d;
+    color: #e6edf3;
+    border-color: #30363d;
+}
+
+[data-bs-theme="dark"] .navbar {
+    background-color: #0d1117 !important;
+    border-bottom: 1px solid #30363d;
+}
+
+/* Animation utilities */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* Status indicators */
+.status-pending {
+    color: var(--trampoline-warning);
+}
+
+.status-confirmed {
+    color: var(--trampoline-success);
+}
+
+.status-cancelled {
+    color: var(--trampoline-danger);
+}
+
+.status-completed {
+    color: var(--bs-gray-600);
+}
+
+/* Notification bell animation */
+@keyframes bellShake {
+    0%, 50%, 100% { transform: rotate(0deg); }
+    10%, 30% { transform: rotate(-10deg); }
+    20%, 40% { transform: rotate(10deg); }
+}
+
+.navbar .fa-bell:hover {
+    animation: bellShake 0.5s ease-in-out;
+}
+
+/* Chart tooltips */
+.chartjs-tooltip {
+    background: rgba(0, 0, 0, 0.8) !important;
+    border: none !important;
+    border-radius: 0.375rem !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bs-gray-900);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--bs-gray-700);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--bs-gray-600);
+}
+
+/* Print styles */
+@media print {
+    .navbar,
+    .btn,
+    .card-footer {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+}
