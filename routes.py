@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 def home():
     return 'Добро пожаловать в CRM!'
   
-@app.route("login")
+@app.route("/login")
 def home():
     return 'Страница логина'
 
