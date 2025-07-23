@@ -7,7 +7,9 @@ from flask import Flask
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask import Flask, render_template
 from werkzeug.security import generate_password_hash
-from extensions import db, login_manager  # Импорт из нового модуля
+from flask_login import logout_user
+from flask import redirect, url_for
+from extensions import db, login_manager # Импорт из нового модуля
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -18,6 +20,11 @@ app = Flask(__name__)
 @app.route('/customers')
 def customers():
     return render_template('customers.html')
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 @app.route('/bookings')
 def bookings():
