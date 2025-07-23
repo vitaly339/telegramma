@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 
 @app.route('/')
-def login():
+def index():
     return render_template('login.html')
     
 app.secret_key = os.environ.get("SESSION_SECRET", "trampoline-park-secret-key")
