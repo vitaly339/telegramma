@@ -29,8 +29,6 @@ def index():
 
     return render_template('login.html')
 
-@app.route('/login', methods=['GET','POST'])
-def login():
     from flask import request, redirect, url_for
     from flask_login import login_user
     from werkzeug.security import check_password_hash
