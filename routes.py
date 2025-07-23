@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 @app.route("/")
 def index():
-    return redirect(url_for('login.html')
+    return redirect(url_for('login.html'))
 
 @app.route('/booking/<int:booking_id>/update_status', methods=['POST'])
 @login_required
