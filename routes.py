@@ -11,6 +11,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+@app.route("/")
+def home():
+    return "Бот работает! Всё подключено."
+
 @app.route('/booking/<int:booking_id>/update_status', methods=['POST'])
 @login_required
 def update_booking_status(booking_id):
