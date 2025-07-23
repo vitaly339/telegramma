@@ -1,3 +1,6 @@
+from flask_login import login_user
+from project_models import Admin  # если ещё не импортирован
+from werkzeug.security import check_password_hash
 from flask import render_template, request, flash, redirect, url_for
 from flask_login import login_required
 from app import app, db
@@ -14,6 +17,22 @@ logger = logging.getLogger(__name__)
 @app.route("/")
 def index():
     return redirect(url_for('login'))
+  
+  @app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        admin = Admin.query.filter_by(username=username).first()
+
+        if admin and check_password_hash(admin.password_hash, password):
+            login_user(admin)
+            flash('Добро пожаловать!', 'success')
+            return redirect(url_for('analytics'))  # или dashboard/bookings/messages
+        else:
+            flash('Неверный логин или пароль', 'danger')
+
+    return render_template('login.html')
 
 @app.route('/booking/<int:booking_id>/update_status', methods=['POST'])
 @login_required
