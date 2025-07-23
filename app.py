@@ -11,7 +11,7 @@ from extensions import db, login_manager  # Импорт из нового мо�
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-@app.route('/login')
+@app.route('/')
 def login():
     return render_template('login.html')
 
