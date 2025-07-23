@@ -19,6 +19,10 @@ app = Flask(__name__)
 def customers():
     return render_template('customers.html')
 
+@app.route('/bookings')
+def bookings():
+    return render_template('bookings.html')
+
 @app.route('/')
 def index():
     return render_template('login.html')
