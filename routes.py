@@ -15,6 +15,17 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+@app.route('/customers')
+@login_required
+def customers():
+    customers = Customer.query.order_by(Customer.created_at.desc()).all()
+    return render_template('customers.html', customers=customers)
+
+@app.route('/bookings')
+@login_required
+def bookings():
+    bookings = Booking.query.order_by(Booking.booking_date.desc()).all()
+    return render_template('bookings.html', bookings=bookings, get_status_text=get_status_text)
 
 @app.route('/login', methods=['GET','POST'])
 def login():
