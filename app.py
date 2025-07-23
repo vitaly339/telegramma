@@ -12,7 +12,7 @@ from extensions import db, login_manager  # Импорт из нового мо�
 logging.basicConfig(level=logging.DEBUG)
 
 # Flask app creation
-app = Flask(_name_)
+app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "trampoline-park-secret-key")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
