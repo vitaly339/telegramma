@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+
+{% block title %}Аналитика - Батутный парк{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1><i class="fas fa-chart-bar me-2"></i>Аналитика</h1>
+            <p class="text-muted">Подробная статистика и анализ</p>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-users me-2 text-primary"></i>Рост клиентской базы</h5>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="text-center">
+                                <h3 class="text-primary">{{ stats.new_customers_today }}</h3>
+                                <small class="text-muted">Сегодня</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-center">
+                                <h3 class="text-success">{{ stats.new_customers_week }}</h3>
+                                <small class="text-muted">За неделю</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-center">
+                                <h3 class="text-info">{{ stats.new_customers_month }}</h3>
+                                <small class="text-muted">За месяц</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-calendar-alt me-2 text-success"></i>Активность бронирования</h5>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="text-center">
+                                <h3 class="text-primary">{{ stats.bookings_today }}</h3>
+                                <small class="text-muted">Сегодня</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-center">
+                                <h3 class="text-success">{{ stats.bookings_week }}</h3>
+                                <small class="text-muted">За неделю</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="text-center">
+                                <h3 class="text-info">{{ stats.bookings_month }}</h3>
+                                <small class="text-muted">За месяц</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Тренды за неделю</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="trendsChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-pie-chart me-2"></i>Статусы броней</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="statusChart" width="200" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Customers -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-star me-2"></i>Топ клиенты</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if top_customers %}
+                    <div class="list-group list-group-flush">
+                        {% for customer, booking_count in top_customers %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-user-circle fa-2x text-muted me-3"></i>
+                                <div>
+                                    <h6 class="mb-0">{{ customer.full_name }}</h6>
+                                    <small class="text-muted">
+                                        {% if customer.phone %}{{ customer.phone }}{% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-primary rounded-pill">{{ booking_count }} броней</span>
+                                <br><small class="text-muted">{{ customer.last_activity.strftime('%d.%m.%Y') }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-users fa-2x text-muted mb-2"></i>
+                        <p class="text-muted mb-0">Пока нет активных клиентов</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Общая статистика</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <div class="text-center p-3 bg-primary bg-opacity-10 rounded">
+                                <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                                <h4 class="mb-0">{{ stats.total_customers }}</h4>
+                                <small class="text-muted">Всего клиентов</small>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="text-center p-3 bg-success bg-opacity-10 rounded">
+                                <i class="fas fa-calendar-alt fa-2x text-success mb-2"></i>
+                                <h4 class="mb-0">{{ stats.total_bookings }}</h4>
+                                <small class="text-muted">Всего броней</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center p-3 bg-info bg-opacity-10 rounded">
+                                <i class="fas fa-envelope fa-2x text-info mb-2"></i>
+                                <h4 class="mb-0">{{ stats.total_messages }}</h4>
+                                <small class="text-muted">Сообщений</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center p-3 bg-warning bg-opacity-10 rounded">
+                                <i class="fas fa-bell fa-2x text-warning mb-2"></i>
+                                <h4 class="mb-0">{{ stats.unread_messages }}</h4>
+                                <small class="text-muted">Непрочитанных</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Trends Chart
+const trendsCtx = document.getElementById('trendsChart').getContext('2d');
+const chartData = {{ chart_data | tojson }};
+
+new Chart(trendsCtx, {
+    type: 'line',
+    data: {
+        labels: chartData.dates,
+        datasets: [{
+            label: 'Новые пользователи',
+            data: chartData.new_users,
+            borderColor: 'rgb(54, 162, 235)',
+            backgroundColor: 'rgba(54, 162, 235, 0.1)',
+            tension: 0.1,
+            fill: true
+        }, {
+            label: 'Сообщения',
+            data: chartData.messages,
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+            tension: 0.1,
+            fill: true
+        }, {
+            label: 'Брони',
+            data: chartData.bookings,
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+            tension: 0.1,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Активность за последние 7 дней'
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)'
+                }
+            },
+            x: {
+                grid: {
+                    color: 'rgba(255, 255, 255, 0.1)'
+                }
+            }
+        }
+    }
+});
+
+// Status Chart
+const statusCtx = document.getElementById('statusChart').getContext('2d');
+const statusData = {{ booking_status_counts | tojson }};
+
+const statusLabels = [];
+const statusValues = [];
+const statusColors = [];
+
+const colorMap = {
+    'pending': 'rgb(255, 193, 7)',
+    'confirmed': 'rgb(25, 135, 84)',
+    'cancelled': 'rgb(220, 53, 69)',
+    'completed': 'rgb(108, 117, 125)'
+};
+
+statusData.forEach(item => {
+    statusLabels.push('{{ get_status_text("' + item[0] + '") }}');
+    statusValues.push(item[1]);
+    statusColors.push(colorMap[item[0]] || 'rgb(108, 117, 125)');
+});
+
+new Chart(statusCtx, {
+    type: 'doughnut',
+    data: {
+        labels: statusLabels,
+        datasets: [{
+            data: statusValues,
+            backgroundColor: statusColors,
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    padding: 15,
+                    usePointStyle: true
+                }
+            }
+        }
+    }
+});
+</script>
+{% endblock %}
