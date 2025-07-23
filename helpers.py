@@ -5,6 +5,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+def format_date(dt, format="%d.%m.%Y"):
+    """Форматирует дату без времени"""
+    if not dt:
+        return ""
+    return dt.strftime(format)
+
 def format_datetime(dt, format="%d.%m.%Y %H:%M"):
     """Форматирует datetime в строку"""
     if not dt:
