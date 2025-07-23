@@ -11,9 +11,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-@app.route("/admin")
+@app.route("/")
 def home():
-    return "Бот работает! Всё подключено."
+    return 'Добро пожаловать в CRM!'
+  
+@app.route("login")
+def home():
+    return 'Страница логина'
 
 @app.route('/booking/<int:booking_id>/update_status', methods=['POST'])
 @login_required
