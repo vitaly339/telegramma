@@ -13,7 +13,7 @@ from helpers import (
 )
 import logging
 
-logger = logging.getLogger(_name_)
+logger = logging.getLogger(__name__)
 
 
 @app.route('/login', methods=['GET', 'POST'])
