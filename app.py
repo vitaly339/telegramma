@@ -13,6 +13,11 @@ logging.basicConfig(level=logging.DEBUG)
 
 # Flask app creation
 app = Flask(__name__)
+
+@app.route('/')
+def login():
+    return render_template('login.html')
+    
 app.secret_key = os.environ.get("SESSION_SECRET", "trampoline-park-secret-key")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
