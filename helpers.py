@@ -5,6 +5,15 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+def get_status_badge_class(status_code):
+    """Возвращает CSS-класс для бейджа по статусу бронирования"""
+    classes = {
+        0: "badge-warning",     # Ожидает
+        1: "badge-success",     # Подтверждено
+        2: "badge-danger"       # Отменено
+    }
+    return classes.get(status_code, "badge-secondary")
+
 def get_status_text(status_code):
     """Возвращает текстовый статус по коду"""
     statuses = {
