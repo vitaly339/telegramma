@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-sys.path.append(str(Path(_file_).parent))
+sys.path.append(str(Path(__file__).parent))
 import os
 import logging
 from flask import Flask
