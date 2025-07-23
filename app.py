@@ -11,10 +11,6 @@ from extensions import db, login_manager  # Импорт из нового мо�
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-@app.route('/')
-def login():
-    return render_template('login.html')
-
 # Flask app creation
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "trampoline-park-secret-key")
