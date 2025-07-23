@@ -12,8 +12,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 @app.route("/")
-def home():
-    return 'Добро пожаловать в CRM!'
+def index():
+    return redirect(url_for('login.html')
 
 @app.route('/booking/<int:booking_id>/update_status', methods=['POST'])
 @login_required
