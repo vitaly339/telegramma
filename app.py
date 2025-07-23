@@ -5,6 +5,7 @@ import os
 import logging
 from flask import Flask
 from werkzeug.middleware.proxy_fix import ProxyFix
+from flask import Flask, render_teplate
 from werkzeug.security import generate_password_hash
 from extensions import db, login_manager  # Импорт из нового модуля
 
