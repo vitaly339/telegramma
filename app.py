@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-sys.path.append(str(Path(__file__).parent))
+sys.path.append(str(Path(_file_).parent))
 import os
 import logging
 from flask import Flask
@@ -12,7 +12,7 @@ from extensions import db, login_manager  # Импорт из нового мо�
 logging.basicConfig(level=logging.DEBUG)
 
 # Flask app creation
-app = Flask(__name__)
+app = Flask(_name_)
 app.secret_key = os.environ.get("SESSION_SECRET", "trampoline-park-secret-key")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
@@ -58,3 +58,8 @@ with app.app_context():
         db.session.add(admin)
         db.session.commit()
         logging.info("Default admin user created: admin/admin123")
+
+# 💡 ЭТО ВАЖНО: Запуск сервера
+if _name_ == "_main_":
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
